@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
+  <title>TTS APP</title>
+</head>
+<body>
+  <div class="mt-12 w-[40%] mx-auto">
+    <form action="" method="post">
+      <textarea type="text" name="text" class="border rounded w-[100%] h-28 p-4" placeholder="Tekst do przekonwertowania"> </textarea>
+      <select name="languages" id="language">
+        {% for i in range(0, languages_len) %}
+        <option value="{{ i }}">{{ languages[i] }}</option>
+        {% endfor %}
+      </select>
+      <select name="voices" id="voices">
+        {% for i in range(0, speakers_len) %}
+        <option value="{{ i }}">{{ speakers[i] }}</option>
+        {% endfor %}
+        </select>
+      <button role="submit" class="px-4 py-2 bg-blue-500 rounded text-white mt-4 disabled:bg-blue-300">Konwertuj</button>
+    </form>
+    <div id="player" class="mt-10"></div>
+  </div>
+       
+</body>
+</html>
+
+<script>
+  const textArea = document.querySelector('textarea');
+  textArea.addEventListener('input', (e) => {
+    e.target.style.height = 'auto';
+    e.target.style.height = `${e.target.scrollHeight}px`;
+  })
+
+  try{
+    MicroModal.init({
+      awaitCloseAnimation: true,
+      onShow: function(modal){
+      },
+      onClose: function(modal){
+      
+      }
+    });
+    }
+    catch(e){
+      console.log('micromodal error: ',e);
+    }
+
+
+  const form = document.querySelector('form');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(form);
+    formData.append('text', form.value);
+    formData.append('language', document.getElementById('language').value);
+    formData.append('speaker', document.getElementById('voices').value);
+
+    const button = document.querySelector('button');
+    button.disabled = true;
+
+    axios.post('', formData)
+      .then(res => {
+        button.disabled = false;
+        Swal.fire('Sukces!', 'Plik został pomyślnie pobrany!', 'success');
+        document.getElementById("player").innerHTML = `
+          <audio class="w-[100%]" controls>
+            <source src="${res.data.file}" type="audio/mpeg">
+          </audio>
+        `
+      })
+      .catch(err => console.log(err))
+  })
+</script>

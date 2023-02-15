@@ -4,78 +4,62 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
   <title>TTS APP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body>
   <div class="mt-12 w-[40%] mx-auto">
-    <form action="" method="post">
-      <textarea type="text" name="text" class="border rounded w-[100%] h-28 p-4" placeholder="Tekst do przekonwertowania"> </textarea>
-      <select name="languages" id="language">
-        {% for i in range(0, languages_len) %}
-        <option value="{{ i }}">{{ languages[i] }}</option>
-        {% endfor %}
-      </select>
-      <select name="voices" id="voices">
-        {% for i in range(0, speakers_len) %}
-        <option value="{{ i }}">{{ speakers[i] }}</option>
-        {% endfor %}
-        </select>
-      <button role="submit" class="px-4 py-2 bg-blue-500 rounded text-white mt-4 disabled:bg-blue-300">Konwertuj</button>
+    <form>
+      <textarea type="text" name="text" class="border rounded w-[100%] h-28 p-4"
+        placeholder="Tekst do przekonwertowania"> </textarea>
+
+      <button type="button" id="modal-btn" class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded">
+        Ustawienia
+      </button>
+
+      <div id="modal" class="modal hidden fixed z-10 inset-0 overflow-y-auto">
+        <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
+        <div
+          class="modal-content mx-auto w-11/12 md:w-1/2 lg:w-1/3 rounded-lg shadow-lg bg-white transform transition-all ease-out duration-500 mt-20">
+          <div class="flex justify-end pt-4 pr-4">
+            <button type="button" id="modal-close-btn" class="text-3xl leading-none hover:text-gray-500">&times;</button>
+          </div>
+          <div class="modal-body px-4 py-2">
+            <h1 class="text-2xl ">Ustawienia: </h1>
+            <p class="text-gray-500">Wybierz język i głos</p>
+
+            <div class="mt-4">
+              Język:
+              <select name="languages" id="language">
+                {% for i in range(0, languages_len) %}
+                <option value="{{ i }}">{{ languages[i] }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mt-4">
+              Głos:
+              <select name="voices" id="voices">
+                {% for i in range(0, speakers_len) %}
+                <option value="{{ i }}">{{ speakers[i] }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <button role="submit" id="submitFormButton"
+        class="px-4 py-2 bg-blue-500 rounded text-white mt-4 disabled:bg-blue-300">Konwertuj</button>
     </form>
     <div id="player" class="mt-10"></div>
   </div>
-       
+  
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
+  <script src="/static/main.js"></script>
 </body>
 </html>
-
-<script>
-  const textArea = document.querySelector('textarea');
-  textArea.addEventListener('input', (e) => {
-    e.target.style.height = 'auto';
-    e.target.style.height = `${e.target.scrollHeight}px`;
-  })
-
-  try{
-    MicroModal.init({
-      awaitCloseAnimation: true,
-      onShow: function(modal){
-      },
-      onClose: function(modal){
-      
-      }
-    });
-    }
-    catch(e){
-      console.log('micromodal error: ',e);
-    }
-
-
-  const form = document.querySelector('form');
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    const formData = new FormData(form);
-    formData.append('text', form.value);
-    formData.append('language', document.getElementById('language').value);
-    formData.append('speaker', document.getElementById('voices').value);
-
-    const button = document.querySelector('button');
-    button.disabled = true;
-
-    axios.post('', formData)
-      .then(res => {
-        button.disabled = false;
-        Swal.fire('Sukces!', 'Plik został pomyślnie pobrany!', 'success');
-        document.getElementById("player").innerHTML = `
-          <audio class="w-[100%]" controls>
-            <source src="${res.data.file}" type="audio/mpeg">
-          </audio>
-        `
-      })
-      .catch(err => console.log(err))
-  })
-</script>
